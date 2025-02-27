@@ -38,16 +38,15 @@ class SerialEDLDevice:
         """Open a serial connection to the detected COM port."""
         if not self.com_port:
             print("[!] No valid EDL COM port found.")
-            return False
+            return None
 
         try:
             self.serial_conn = serial.Serial(self.com_port, self.baudrate, timeout=1)
             print(f"[+] Connected to {self.com_port}")
-            return self.serial_conn
-            return True
+            return self.serial_conn  # Return the established connection
         except serial.SerialException as e:
             print(f"[!] Serial Error: {e}")
-            return False
+            return None
 
     def close_connection(self):
         """Close the serial connection."""
@@ -55,15 +54,11 @@ class SerialEDLDevice:
             self.serial_conn.close()
             print("[+] Connection closed.")
 
-    def send_hello(self):
-        """Send a Hello packet and read the response."""
-        if not self.serial_conn:
-            print("[!] No active connection.")
-            return
 
 if __name__ == "__main__":
     edl = SerialEDLDevice()
 
     if edl.wait_for_device():
-        if edl.open_connection():
-            edl.close_connection()
+        conn = edl.open_connection()
+        if conn:
+            conn.close()  # Close explicitly
